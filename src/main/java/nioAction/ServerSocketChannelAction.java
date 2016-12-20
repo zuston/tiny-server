@@ -25,10 +25,7 @@ public class ServerSocketChannelAction {
                 t.start();
             }
         }
-
-
     }
-
 }
 
 class listener implements Runnable{
