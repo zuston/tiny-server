@@ -14,7 +14,6 @@ import java.util.Iterator;
  * Created by zuston on 16-12-16.
  */
 public class SelectorAction {
-
     public static void main(String[] args) throws IOException {
         Selector selector = Selector.open();
         ServerSocketChannel ssc = ServerSocketChannel.open();
@@ -22,7 +21,6 @@ public class SelectorAction {
         ssc.configureBlocking(false);
         //流注册selector
         ssc.register(selector, SelectionKey.OP_ACCEPT);
-
 
         while (true){
             if(selector.select(3000)==0){
