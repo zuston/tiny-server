@@ -1,5 +1,7 @@
 package fuckServer;
 
+import fuckServer.bean.SocketBean;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -32,8 +34,7 @@ public class SocketAccept implements Runnable{
         while(true){
             try {
                 SocketChannel sc = this.ssc.accept();
-                System.out.println("accept the request from "+sc.socket().getRemoteSocketAddress());
-                this.queue.add(new Socket(sc));
+                this.queue.add(new SocketBean(sc));
             } catch (IOException e) {
                 e.printStackTrace();
             }

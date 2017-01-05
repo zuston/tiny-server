@@ -1,10 +1,13 @@
 package fuckServer;
 
+import fuckServer.Http.Http;
+import fuckServer.bean.SocketBean;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -14,13 +17,11 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class SocketHandler implements Runnable{
 
-    public ArrayBlockingQueue<Socket> queue = null;
+    public ArrayBlockingQueue<SocketBean> queue = null;
 
     public Selector readSelector = null;
     public Selector writeSeletor = null;
-
-    public long messageTip = 0;
-    public HashMap<Long,ByteBuffer> messageContainer = new HashMap<Long, ByteBuffer>();
+    public Http http = null;
 
     public SocketHandler(ArrayBlockingQueue requestQueue) throws IOException {
         this.queue = requestQueue;
@@ -40,13 +41,10 @@ public class SocketHandler implements Runnable{
         }
     }
 
-
     public void register() throws IOException{
-        Socket socket = this.queue.poll();
+        SocketBean socket = this.queue.poll();
         while (socket!=null){
-            System.out.println("get the queue");
             socket.socketChannel.configureBlocking(false);
-            socket.socketId = this.messageTip++;
             SelectionKey selectionKey = socket.socketChannel.register(this.readSelector,SelectionKey.OP_READ);
             selectionKey.attach(socket);
             socket = this.queue.poll();
@@ -67,17 +65,24 @@ public class SocketHandler implements Runnable{
     }
 
     private void readAction(SelectionKey sk) throws IOException {
-        Socket socket = (Socket) sk.attachment();
+        SocketBean socket = (SocketBean) sk.attachment();
+        int size = 0 ;
 
-        int bufferReadKey = socket.socketChannel.read(socket.byteBuffer);
-
-        if(bufferReadKey==-1){
-            sk.cancel();
-            sk.channel().close();
-        }else{
-            SelectionKey skWriter = socket.socketChannel.register(this.writeSeletor,SelectionKey.OP_WRITE);
-            skWriter.attach(socket);
+        ByteBuffer tempBuffer = ByteBuffer.allocate(1024);
+        ByteArrayOutputStream sos = new ByteArrayOutputStream();
+        while ((size=socket.socketChannel.read(tempBuffer))>0){
+            tempBuffer.flip();
+            byte[] b = new byte[size];
+            tempBuffer.get(b);
+            sos.write(b);
+            tempBuffer.clear();
         }
+        socket.info = new String(sos.toByteArray());
+        http = new Http(socket);
+        http.parser();
+        SelectionKey skWriter = socket.socketChannel.register(this.writeSeletor,SelectionKey.OP_WRITE);
+        skWriter.attach(socket);
+        sk.cancel();
     }
 
     public void write() throws IOException{
@@ -87,10 +92,16 @@ public class SocketHandler implements Runnable{
             Iterator<SelectionKey> iter = selectionKeyIterator.iterator();
             while (iter.hasNext()){
                 SelectionKey sk = iter.next();
-                Socket socket = (Socket) sk.attachment();
-                socket.byteBuffer.flip();
-                socket.socketChannel.write(socket.byteBuffer);
-                socket.byteBuffer.clear();
+                SocketBean socket = (SocketBean) sk.attachment();
+
+                ByteBuffer temp = ByteBuffer.allocate(1024*1024);
+                temp.put(socket.response.toString().getBytes());
+                temp.flip();
+                while (temp.hasRemaining()){
+                    socket.socketChannel.write(temp);
+                }
+                temp.clear();
+                socket.socketChannel.close();
                 iter.remove();
             }
             selectionKeyIterator.clear();

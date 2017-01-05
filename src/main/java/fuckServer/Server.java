@@ -19,12 +19,10 @@ public class Server {
         ArrayBlockingQueue requestQueue = new ArrayBlockingQueue(1024);
 
         this.socketAccept = new SocketAccept(port,requestQueue);
-
         this.socketHandler = new SocketHandler(requestQueue);
 
         new Thread(this.socketAccept).start();
         new Thread(this.socketHandler).start();
     }
-
 
 }
