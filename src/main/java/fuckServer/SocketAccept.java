@@ -1,6 +1,6 @@
 package fuckServer;
 
-import fuckServer.bean.SocketBean;
+import fuckServer.Bean.SocketBean;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

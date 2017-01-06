@@ -1,4 +1,4 @@
-package fuckServer.bean;
+package fuckServer.Bean;
 
 import java.nio.channels.SocketChannel;
 

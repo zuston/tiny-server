@@ -1,7 +1,7 @@
 package fuckServer;
 
 import fuckServer.Http.Http;
-import fuckServer.bean.SocketBean;
+import fuckServer.Bean.SocketBean;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
