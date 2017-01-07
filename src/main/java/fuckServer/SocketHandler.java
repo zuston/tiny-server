@@ -11,6 +11,8 @@ import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by zuston on 16-12-20.
@@ -22,11 +24,14 @@ public class SocketHandler implements Runnable{
     public Selector readSelector = null;
     public Selector writeSeletor = null;
     public Http http = null;
+    public Logger logger = null;
 
     public SocketHandler(ArrayBlockingQueue requestQueue) throws IOException {
         this.queue = requestQueue;
         this.readSelector = Selector.open();
         this.writeSeletor = Selector.open();
+        this.logger = Logger.getLogger("Handler");
+        logger.setLevel(Level.INFO);
     }
 
     public void run(){
@@ -102,6 +107,7 @@ public class SocketHandler implements Runnable{
                 }
                 temp.clear();
                 socket.socketChannel.close();
+                logger.info("["+socket.getPid()+"]close the connection");
                 iter.remove();
             }
             selectionKeyIterator.clear();

@@ -2,6 +2,8 @@ package fuckServer;
 
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by zuston on 16-12-20.
@@ -23,6 +25,11 @@ public class Server {
 
         new Thread(this.socketAccept).start();
         new Thread(this.socketHandler).start();
+
+        Logger logger = Logger.getLogger("server");
+        logger.setLevel(Level.INFO);
+
+        logger.info("server is running");
     }
 
 }

@@ -12,7 +12,7 @@ public class fastcgiTest {
 
         Fastcgi client = new Fastcgi("127.0.0.1",19999);
         String content = "name=zuston&age=23";
-        String uri = "/echo.php";
+        String uri = "/index.php";
         Map<String, String> params = new HashMap<String, String>();
         String documentRoot = "/Users/zuston/dev/fuckServer/PhpApp";
         params.put("GATEWAY_INTERFACE", "FastCGI/1.0");

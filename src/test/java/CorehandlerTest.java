@@ -12,6 +12,6 @@ public class CorehandlerTest {
         hn.put("name","zistpm");
         hn.put("age","23");
         System.out.println(ch.contentGenerate(hn));
-        ch.parseFastcgi("");
+
     }
 }

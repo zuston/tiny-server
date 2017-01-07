@@ -1,5 +1,6 @@
 package fuckServer.Http.Handler;
 
+import fuckServer.Bean.FastcgiBean;
 import fuckServer.Bean.HttpBean;
 import fuckServer.Fastcgi.Fastcgi;
 
@@ -16,11 +17,17 @@ public class CoreHandler {
     public String method;
     public String uri;
     public HashMap<String,String> params = new HashMap<String, String>();
+    public FastcgiBean fastcgiBean = null;
     public CoreHandler(HttpBean servlet) {
         this.servlet = servlet;
         this.method = servlet.getMethod();
         this.uri = servlet.getUrl();
         this.params = servlet.getRequest();
+
+        this.fastcgiBean = new FastcgiBean(19999
+                ,"127.0.0.1"
+                ,"/Users/zuston/dev/fuckServer/PhpApp"
+                ,1);
     }
 
     public CoreHandler() {
@@ -30,14 +37,13 @@ public class CoreHandler {
     public String initPhp() throws IOException {
         Fastcgi client = new Fastcgi("127.0.0.1",19999);
         String content = contentGenerate(this.params);
-        System.out.println(content);
         String uri = this.uri;
         Map<String, String> params = new HashMap<String, String>();
         String documentRoot = "/Users/zuston/dev/fuckServer/PhpApp";
         params.put("GATEWAY_INTERFACE", "FastCGI/1.0");
         params.put("REQUEST_METHOD", "POST");
-        params.put("SCRIPT_FILENAME", documentRoot + uri);
-        params.put("SCRIPT_NAME", uri);
+        params.put("SCRIPT_FILENAME", documentRoot + "/index.php");
+        params.put("SCRIPT_NAME","/index.php");
         params.put("QUERY_STRING", "");
         params.put("REQUEST_URI", uri);
         params.put("DOCUMENT_ROOT", documentRoot);
@@ -81,7 +87,7 @@ public class CoreHandler {
         return sb.toString();
     }
 
-    // TODO: 17/1/6 完成java的框架 
+    // TODO: 17/1/6 完成java的框架
     public String initJava(){
         return null;
     }
